@@ -1,29 +1,65 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, Platform } from 'react-native';
+import React, {useEffect, useState} from "react";
+import { Silkscreen_400Regular, useFonts } from "@expo-google-fonts/silkscreen";
+import * as SplashScreen from 'expo-splash-screen';
+import './styles.css';
 
-import Simbolo_1 from './assets/images/Simbolo_1.jpg';
+import ButtonsGridComp from "./components/ButtonsGridComp";
 
 export default function App() {
+
+  const [loaded, error] = useFonts({Silkscreen_400Regular});
+  const [valueX, setValueX] = useState(0);
+  const [valueY, setValueY] = useState(0);
+  const [valueZ, setValueZ] = useState(0);
+  const [hasPresses, setHasPresses] = useState(false);
+
+  const firstEquation: number = hasPresses ? (2*valueX)+11 : 0;
+  const secondEquation: number = hasPresses ? (2*valueZ + valueY)-5 : 0;
+  const thirdEquation: number = hasPresses ? Math.abs((valueY + valueZ) - valueX) : 0;
+
+  useEffect(()=>{
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+      }
+    }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+  const setX = (v: number)=>{
+    setValueX(v);
+    setHasPresses(true);
+  };
+
+  const setY = (v: number) => {
+    setValueY(v);
+    setHasPresses(true);
+  };
+
+  const setZ = (v: number) => {
+    setValueZ(v);
+    setHasPresses(true);
+  };
+
   return (
     <View style={styles.container}>
+      <Text style={styles.credText}>By: DannyB935</Text>
       <View style={styles.rows}>
-        <Text style={styles.labels}>X</Text>
-        <View style={styles.grid}>
-          <TouchableOpacity style={styles.imgBtn}>
-            <Image source={Simbolo_1} style={styles.images}></Image>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.imgBtn}><Text style={styles.simpleText}>Btn1</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.imgBtn}><Text style={styles.simpleText}>Btn1</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.imgBtn}><Text style={styles.simpleText}>Btn1</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.imgBtn}><Text style={styles.simpleText}>Btn1</Text></TouchableOpacity>
-          <TouchableOpacity style={styles.imgBtn}><Text style={styles.simpleText}>Btn1</Text></TouchableOpacity>
-        </View>
+        <ButtonsGridComp label={"X"} setValue={setX}/>
       </View>
       <View style={styles.rows}>
-        <Text style={styles.labels}>Y</Text>
+        <ButtonsGridComp label={"Y"} setValue={setY}/>
       </View>
       <View style={styles.rows}>
-        <Text style={styles.labels}>Z</Text>
+        <ButtonsGridComp label={"Z"} setValue={setZ}/>
+      </View>
+      <View style={styles.numContainer}>
+        <Text style={styles.resNumbers}>
+          {/*We set the values according the equations in game*/}
+          {firstEquation} {secondEquation} {thirdEquation}
+        </Text>
       </View>
     </View>
   );
@@ -40,32 +76,21 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     flexDirection: 'row',
   },
-  grid:{
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '80%',
-    maxWidth: '80%'
+  numContainer:{
+    padding: 15,
+    marginVertical: 10
   },
-  imgBtn:{
-    borderRadius: 5,
-    marginHorizontal: 10,
-    marginVertical: 10,
-    width: '23%',
-    maxWidth: '23%',
+  resNumbers:{
+    color: 'white',
+    fontSize: 63,
+    fontWeight: "semibold",
+    fontFamily: Platform.select({
+      android: 'Silkscreen_400Regular',
+      ios: 'Silkscreen_400Regular',
+    }),
   },
-  images:{
-    height: 70,
-    width: 70
-  },
-  labels: {
-    fontSize: 64,
-    fontWeight: 'semibold',
-    color: '#fff',
-    width: '20%',
-    maxWidth: '20%',
-    paddingHorizontal: 20
-  },
-  simpleText: {
-    color: '#fff'
+  credText:{
+    color: 'white',
+    fontSize: 18,
   }
 });
